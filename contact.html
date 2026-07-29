@@ -18,6 +18,7 @@
 <helmet>
   <link rel="stylesheet" href="styles.css">
   <script src="_ds_bundle.js"></script>
+  <script src="contact-form.js"></script>
   <title>Contact — Ground Truth Advisory</title>
 </helmet>
 
@@ -75,63 +76,6 @@
 
   <footer style="max-width:1200px;margin:0 auto;padding:24px 40px 40px;font-size:13px;opacity:0.6;">© 2026 Ground Truth Advisory.</footer>
 </div>
-
-<script>
-(function () {
-  // Delegated on document (not the form node directly): this page's runtime
-  // re-renders content after initial parse, so a form reference captured at
-  // script-load time can go stale. Resolving the form fresh from the event
-  // target guarantees the listener works regardless of when the form actually
-  // lands in the DOM.
-  var portalId = '246896085';
-  var formGuid = '7dfb953b-635c-4ced-a997-dad1f650880d';
-
-  document.addEventListener('submit', function (e) {
-    var form = e.target.closest ? e.target.closest('#contact-form') : null;
-    if (!form || form.id !== 'contact-form') return;
-    e.preventDefault();
-
-    var status = form.querySelector('#form-status');
-    var submitBtn = form.querySelector('button[type="submit"]');
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Sending…';
-
-    var fields = [
-      { name: 'firstname', value: form.querySelector('#firstname').value },
-      { name: 'lastname', value: form.querySelector('#lastname').value },
-      { name: 'email', value: form.querySelector('#email').value },
-      { name: 'company', value: form.querySelector('#company').value },
-      { name: 'phone', value: form.querySelector('#phone').value },
-      { name: 'message', value: form.querySelector('#message').value }
-    ];
-
-    fetch('https://api.hsforms.com/submissions/v3/integration/submit/' + portalId + '/' + formGuid, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        fields: fields,
-        context: { pageUri: window.location.href, pageName: document.title }
-      })
-    })
-      .then(function (res) {
-        if (!res.ok) throw new Error('Submission failed');
-        form.querySelectorAll('.field, button[type="submit"]').forEach(function (el) {
-          el.style.display = 'none';
-        });
-        status.style.display = 'block';
-        status.style.color = '';
-        status.textContent = "Thanks — we've got it and will be in touch shortly.";
-      })
-      .catch(function () {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Send';
-        status.style.display = 'block';
-        status.style.color = '#b3261e';
-        status.textContent = "Something went wrong sending that. Please try again, or email ryanoconnor@groundtruthadvisory.co directly.";
-      });
-  });
-})();
-</script>
 
 </x-dc>
 </body>
