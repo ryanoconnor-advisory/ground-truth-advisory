@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+<template id="__bundler_thumbnail" data-bg-color="#f2f2f3">
+  <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+    <rect x="10" y="10" width="100" height="100" fill="none" stroke="#5980a6" stroke-width="2"/>
+    <path d="M10 4v12M22 10H10M98 10h12M110 4v12" stroke="#5980a6" stroke-width="1.5"/>
+    <path d="M10 104v12M22 110H10M98 110h12M110 104v12" stroke="#5980a6" stroke-width="1.5"/>
+    <text x="60" y="68" font-family="Georgia, serif" font-size="40" font-weight="700" fill="#1d1f20" text-anchor="middle">GT</text>
+  </svg>
+</template>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="styles.css">
+  <script src="_ds_bundle.js"></script>
+  <title>Contact — Ground Truth Advisory</title>
+</helmet>
+
+<div style="background:var(--color-bg);min-height:100vh;">
+
+  <nav class="nav" style="max-width:1200px;margin:0 auto;padding:20px 40px;">
+    <span class="nav-brand">Ground Truth Advisory</span>
+    <a href="./index.html">Home</a>
+    <a href="./offerings.html">Offerings</a>
+    <a href="#form" aria-current="page" class="btn btn-primary">Schedule a Consultation</a>
+  </nav>
+
+  <section style="max-width:1200px;margin:0 auto;padding:72px 40px 48px;">
+    <div style="font-family:var(--font-heading);font-size:13px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-accent-700);margin-bottom:14px;">Let's start the conversation</div>
+    <h1 style="font-size:clamp(36px,5.5vw,58px);line-height:1.06;text-transform:uppercase;letter-spacing:0.01em;margin:0;max-width:20ch;">Tell us where you're starting from.</h1>
+    <p style="font-size:17px;line-height:1.6;max-width:64ch;margin:20px 0 0;opacity:0.82;">A few details on your organization and what you're looking for — we'll follow up to figure out whether a diagnostic, embedded advisory, or project engagement is the right place to start.</p>
+  </section>
+
+  <section id="form" style="max-width:1200px;margin:0 auto;padding:16px 40px 96px;">
+    <div class="blueprint" style="position:relative;max-width:640px;padding:32px;">
+      <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+      <form id="contact-form">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+          <div class="field">
+            <label for="firstname">First name</label>
+            <input class="input" id="firstname" name="firstname" type="text" autocomplete="given-name" required>
+          </div>
+          <div class="field">
+            <label for="lastname">Last name</label>
+            <input class="input" id="lastname" name="lastname" type="text" autocomplete="family-name" required>
+          </div>
+          <div class="field">
+            <label for="email">Email</label>
+            <input class="input" id="email" name="email" type="email" autocomplete="email" required>
+          </div>
+          <div class="field">
+            <label for="company">Company</label>
+            <input class="input" id="company" name="company" type="text" autocomplete="organization">
+          </div>
+          <div class="field" style="grid-column:1/-1;">
+            <label for="phone">Phone</label>
+            <input class="input" id="phone" name="phone" type="tel" autocomplete="tel">
+          </div>
+          <div class="field" style="grid-column:1/-1;">
+            <label for="message">What kind of help are you looking for?</label>
+            <textarea class="input" id="message" name="message" rows="4" placeholder="Diagnostic, embedded advisory, project work — or not sure yet."></textarea>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary" style="margin-top:24px;">Send</button>
+        <p id="form-status" role="status" style="display:none;font-size:14px;margin-top:16px;"></p>
+        <noscript><p style="margin-top:16px;font-size:13px;opacity:0.75;">JavaScript is required to submit this form. You can also reach us directly at <a href="mailto:ryanoconnor@groundtruthadvisory.co">ryanoconnor@groundtruthadvisory.co</a>.</p></noscript>
+      </form>
+    </div>
+  </section>
+
+  <footer style="max-width:1200px;margin:0 auto;padding:24px 40px 40px;font-size:13px;opacity:0.6;">© 2026 Ground Truth Advisory.</footer>
+</div>
+
+<script>
+(function () {
+  var form = document.getElementById('contact-form');
+  if (!form) return;
+  var status = document.getElementById('form-status');
+  var portalId = '246896085';
+  var formGuid = '7dfb953b-635c-4ced-a997-dad1f650880d';
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var submitBtn = form.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending…';
+
+    var fields = [
+      { name: 'firstname', value: document.getElementById('firstname').value },
+      { name: 'lastname', value: document.getElementById('lastname').value },
+      { name: 'email', value: document.getElementById('email').value },
+      { name: 'company', value: document.getElementById('company').value },
+      { name: 'phone', value: document.getElementById('phone').value },
+      { name: 'message', value: document.getElementById('message').value }
+    ];
+
+    fetch('https://api.hsforms.com/submissions/v3/integration/submit/' + portalId + '/' + formGuid, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        fields: fields,
+        context: { pageUri: window.location.href, pageName: document.title }
+      })
+    })
+      .then(function (res) {
+        if (!res.ok) throw new Error('Submission failed');
+        form.querySelectorAll('.field, button[type="submit"]').forEach(function (el) {
+          el.style.display = 'none';
+        });
+        status.style.display = 'block';
+        status.style.color = '';
+        status.textContent = "Thanks — we've got it and will be in touch shortly.";
+      })
+      .catch(function () {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Send';
+        status.style.display = 'block';
+        status.style.color = '#b3261e';
+        status.textContent = "Something went wrong sending that. Please try again, or email ryanoconnor@groundtruthadvisory.co directly.";
+      });
+  });
+})();
+</script>
+
+</x-dc>
+</body>
+</html>
