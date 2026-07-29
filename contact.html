@@ -78,25 +78,31 @@
 
 <script>
 (function () {
-  var form = document.getElementById('contact-form');
-  if (!form) return;
-  var status = document.getElementById('form-status');
+  // Delegated on document (not the form node directly): this page's runtime
+  // re-renders content after initial parse, so a form reference captured at
+  // script-load time can go stale. Resolving the form fresh from the event
+  // target guarantees the listener works regardless of when the form actually
+  // lands in the DOM.
   var portalId = '246896085';
   var formGuid = '7dfb953b-635c-4ced-a997-dad1f650880d';
 
-  form.addEventListener('submit', function (e) {
+  document.addEventListener('submit', function (e) {
+    var form = e.target.closest ? e.target.closest('#contact-form') : null;
+    if (!form || form.id !== 'contact-form') return;
     e.preventDefault();
+
+    var status = form.querySelector('#form-status');
     var submitBtn = form.querySelector('button[type="submit"]');
     submitBtn.disabled = true;
     submitBtn.textContent = 'Sending…';
 
     var fields = [
-      { name: 'firstname', value: document.getElementById('firstname').value },
-      { name: 'lastname', value: document.getElementById('lastname').value },
-      { name: 'email', value: document.getElementById('email').value },
-      { name: 'company', value: document.getElementById('company').value },
-      { name: 'phone', value: document.getElementById('phone').value },
-      { name: 'message', value: document.getElementById('message').value }
+      { name: 'firstname', value: form.querySelector('#firstname').value },
+      { name: 'lastname', value: form.querySelector('#lastname').value },
+      { name: 'email', value: form.querySelector('#email').value },
+      { name: 'company', value: form.querySelector('#company').value },
+      { name: 'phone', value: form.querySelector('#phone').value },
+      { name: 'message', value: form.querySelector('#message').value }
     ];
 
     fetch('https://api.hsforms.com/submissions/v3/integration/submit/' + portalId + '/' + formGuid, {
